@@ -34,7 +34,7 @@
         :top="true"
         v-model="showAlert"
       >
-      {{ messege }}
+      {{ loginError }}
       </v-snackbar>
     </v-layout>
   </v-container>
@@ -55,15 +55,28 @@ export default {
       passwordRules: [v => !!v || 'Você precisa digitar sua senha']
     }
   },
+  computed: {
+    isLoggedIn () {
+      return this.$store.getters.isLoggedIn
+    },
+    loginError () {
+      return this.$store.getters.loginError
+    }
+  },
   methods: {
     login: function () {
       const vm = this
-      if (vm.password === '10203045') {
-        this.$router.push({ path: '/' })
-      } else {
-        vm.showAlert = true
-        vm.messege = 'Login ou Senha Inválidos'
+      const payload = {
+        email: this.email,
+        password: this.password
       }
+      this.$store.dispatch('logInUser', payload).then(() => {
+        if (vm.isLoggedIn) {
+          this.$router.push({ path: '/' })
+        } else {
+          vm.showAlert = true
+        }
+      })
     },
     cancel: function () {
       console.log('O usuário não quer se conectar')
